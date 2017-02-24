@@ -64,8 +64,13 @@ void heapify(heap* heap, int i) {
 	}
 }
 
-
-
+// A utility function to check if a given vertex
+// 'v' is in min heap or not
+void isInMinHeap(heap* heap, int v)
+{
+	//check if vertex v is is in the heapify heap 
+}
+ 
 
 // deletes minimum node and returns it
 // Check for empty before calling deletemin
@@ -125,24 +130,29 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 	REM_EDGES = 0;
 
 	// different prune cutoff for each dimension
-	float prune_cutoff;
+	float throw_edge;
+	throw_edge = 100/(pow(log2((float)numpoints), 4));
 	 
-	// setup graph
-	if (dimension == 0) {
-		prune_cutoff = 64.0/(pow(log2((float)numpoints), 3));
+	 switch(dimension){
+	 	case 0: 
+	 	throw_edge = 100/(pow(log2((float)numpoints), 4));
 		int i;
 		for (i = 0; i < numpoints; i++) {
 			int j;
 			for (j = i; j < numpoints; j++) {
 				float weight = rand() / (float)RAND_MAX;
-				// prune
-				if (weight < prune_cutoff) {
-					REM_EDGES++;
-					edge* forward_edge = malloc(sizeof(edge));
+				//forward edges 
+				edge* forward_edge = malloc(sizeof(edge));
 					forward_edge->source = i; 
 					forward_edge->target = j;
 					forward_edge->weight = weight;
 
+
+				// prune
+				if (weight <= throw_edge) {
+					REM_EDGES++;
+					//backwardeedges 
+					
 					edge* back_edge = malloc(sizeof(edge));
 					back_edge->source = j;
 					back_edge->target = i;
@@ -156,10 +166,9 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 				}
 			}
 		}
-	}
-	else if (dimension == 2) {
-		prune_cutoff = 64.0/(pow(log2((float)numpoints), 3));
-		int i;
+		case 2:
+		throw_edge;
+		
 		for (i = 0; i < numpoints; i++) {
 			ptarray[i].a = rand() / (float)RAND_MAX;
 			ptarray[i].b = rand() / (float)RAND_MAX;
@@ -172,7 +181,7 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 			for (j = i; j < numpoints; j++) {
 				float curr_weight = sqrt(pow(ptarray[i].a- ptarray[j].a, 2)
 						+ pow(ptarray[i].b-ptarray[j].b, 2));
-				if (curr_weight < prune_cutoff) {
+				if (curr_weight < throw_edge) {
 					REM_EDGES++;
 					edge* forward_edge = malloc(sizeof(edge));
 					forward_edge->source = i; 
@@ -192,10 +201,9 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 				}				
 			}
 		}
-	}
-	else if (dimension == 3) {
-		prune_cutoff = 16.0/(pow(log2((float)numpoints), 2));
-		int i;
+		case 3: 
+		throw_edge;
+		
 		for (i = 0; i < numpoints; i++) {
 			ptarray[i].a = rand() / (float)RAND_MAX;
 			ptarray[i].b = rand() / (float)RAND_MAX;
@@ -209,7 +217,7 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 				float curr_weight = sqrt(pow(ptarray[i].a- ptarray[j].a, 2)
 					+ pow(ptarray[i].b-ptarray[j].b, 2)
 					+ pow(ptarray[i].c-ptarray[j].c, 2));
-				if (curr_weight < prune_cutoff) {
+				if (curr_weight < throw_edge) {
 					REM_EDGES++;
 					edge* forward_edge = malloc(sizeof(edge));
 					forward_edge->source = i; 
@@ -229,10 +237,9 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 				}				
 			}
 		}
-	}
-	else {
-		prune_cutoff = 8.0/(pow(log2((float)numpoints), 3/2));
-		int i;
+		default:
+		throw_edge;
+		
 		for (i = 0; i < numpoints; i++) {
 			ptarray[i].a = rand() / (float)RAND_MAX;
 			ptarray[i].b = rand() / (float)RAND_MAX;
@@ -246,7 +253,7 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 					+ pow(ptarray[i].b - ptarray[j].b, 2)
 					+ pow(ptarray[i].c - ptarray[j].c, 2)
 					+ pow(ptarray[i].d - ptarray[j].d, 2));
-				if (curr_weight < prune_cutoff) {
+				if (curr_weight < throw_edge) {
 					REM_EDGES++;
 					edge* forward_edge = malloc(sizeof(edge));
 					forward_edge->source = i; 
@@ -266,55 +273,52 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 				}
 			}
 		}
-	}
+		return g;
 
-	return g;
+	 }
+
 }
 
+
 // Prim's algorithm, to find MST and return its weight
-float prim(edge** g, graph_node* ptarray, int numpoints, int v_index) {
-	// initialize heap
+
+float prim(edge** g, graph_node* ptarray, int numpoints, int v_index, int n) {
+	
+	int visited[numpoints];
+		for (n = 0; n < numpoints; n++) visited[n] = 0;
+	
+
+	float rweight = 0.0;
+
+//initialize heap 
 	heap* x = malloc(sizeof(heap));
 	x->heap = malloc(sizeof(edge)*REM_EDGES);
 	x->heapsz = 0;
-	
-
-	edge first = {0,0,0,NULL};
+	edge first = {0,0,0,0};
 	insert(x, &first);
 
-	// S
-	int explored_v[numpoints];
-
-	float return_weight = 0.0;
-	int i;
-	for (i = 0; i < numpoints; i++) {
-		explored_v[i] = 0;
-	}
 
 	while (x->heapsz != 0) {
-		edge deleted = deletemin(x);
-		int e = deleted.target;
-		if (!explored_v[e]) {
+		edge destroyed = deletemin(x);
+		int d_e = destroyed.target;
 
-			explored_v[e] = 1;
-			edge* curr = g[e];
-			while (curr) {
-				if (!explored_v[curr->target]) {
-					insert(x, curr);
+		if (visited[d_e] != 1) {
+
+			visited[d_e] = 1;
+			edge* current = g[d_e];
+			
+			while (current) {
+				if (visited[current->target] !=1) {
+					insert(x, current);
 				}
-				curr= curr->next;
+				current= current->next;
 			}
-
-			if (e!= deleted.source) {
-				return_weight += deleted.weight;
-			}
-			// heap_printer(m, 0);
+				float weightresult = (rweight += destroyed.weight);
 		}	
 	}
-
-	free(x->heap);
 	free(x);
-	return return_weight;
+	free(x->heap);
+	return rweight;
 }
 
 int main(int argc, char* argv[]) {
@@ -340,7 +344,7 @@ int main(int argc, char* argv[]) {
 		edge** g = generate_graph(numpoints, dimension, pointarray);
 
 		// if we prune off too many edges, we will get a zero-weighted MST
-		float results= prim(g, pointarray, numpoints, 0);
+		float results= prim(g, pointarray, numpoints, 0,0);
 		final+= results;
 
 		free(pointarray);
