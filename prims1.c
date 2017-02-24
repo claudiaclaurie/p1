@@ -126,16 +126,16 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 	// array of all the points
 	ptarray= malloc(sizeof(graph_node) * numpoints);
 
-	// count number of edges after pruning
+	// count number of edges after throwing away for optimization 
 	REM_EDGES = 0;
 
-	// different prune cutoff for each dimension
+	// thro away edges that make the graph to large- optimization 
 	float throw_edge;
 	throw_edge = 100/(pow(log2((float)numpoints), 4));
 	 
 	 switch(dimension){
 	 	case 0: 
-	 	throw_edge = 100/(pow(log2((float)numpoints), 4));
+	 	throw_edge;
 		int i;
 		for (i = 0; i < numpoints; i++) {
 			int j;
@@ -143,11 +143,7 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 				float weight = rand() / (float)RAND_MAX;
 				//forward edges 
 				edge* forward_edge = malloc(sizeof(edge));
-					forward_edge->source = i; 
-					forward_edge->target = j;
-					forward_edge->weight = weight;
-
-
+					forward_edge->source = i, forward_edge->target = j, forward_edge->weight = weight;
 				// prune
 				if (weight <= throw_edge) {
 					REM_EDGES++;
@@ -170,28 +166,23 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 		throw_edge;
 		
 		for (i = 0; i < numpoints; i++) {
-			ptarray[i].a = rand() / (float)RAND_MAX;
-			ptarray[i].b = rand() / (float)RAND_MAX;
-			ptarray[i].c = 0;
-			ptarray[i].d = 0;
+			float weight = rand() / (float)RAND_MAX;
+			ptarray[i].a = weight, ptarray[i].b = rand() / (float)RAND_MAX, ptarray[i].c = 0, ptarray[i].d = 0;
 		}
 		
 		for (i = 0; i < numpoints; i++) {
 			int j;
 			for (j = i; j < numpoints; j++) {
-				float curr_weight = sqrt(pow(ptarray[i].a- ptarray[j].a, 2)
-						+ pow(ptarray[i].b-ptarray[j].b, 2));
+				
+				//euclidian math done here 
+				float curr_weight = sqrt(pow(ptarray[i].a- ptarray[j].a, 2)+ pow(ptarray[i].b-ptarray[j].b, 2));
 				if (curr_weight < throw_edge) {
 					REM_EDGES++;
 					edge* forward_edge = malloc(sizeof(edge));
-					forward_edge->source = i; 
-					forward_edge->target = j;
-					forward_edge->weight = curr_weight;
+					forward_edge->source = i, forward_edge->target = j, forward_edge->weight = curr_weight;
 
 					edge* back_edge = malloc(sizeof(edge));
-					back_edge->source = j;
-					back_edge->target = i;
-					back_edge->weight = curr_weight;
+					back_edge->source = j, back_edge->target = i, back_edge->weight = curr_weight;
 
 					forward_edge->next = g[i];
 					g[i] = forward_edge;
@@ -205,29 +196,23 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 		throw_edge;
 		
 		for (i = 0; i < numpoints; i++) {
-			ptarray[i].a = rand() / (float)RAND_MAX;
-			ptarray[i].b = rand() / (float)RAND_MAX;
-			ptarray[i].c = rand() / (float)RAND_MAX;
-			ptarray[i].d = 0;
+			float weight = rand() / (float)RAND_MAX;
+			ptarray[i].a = weight, ptarray[i].b = weight, ptarray[i].c = rand() / (float)RAND_MAX, ptarray[i].d = 0;
 		}
 		
 		for (i = 0; i < numpoints; i++) {
 			int j;
 			for (j = i; j < numpoints; j++) {
-				float curr_weight = sqrt(pow(ptarray[i].a- ptarray[j].a, 2)
-					+ pow(ptarray[i].b-ptarray[j].b, 2)
-					+ pow(ptarray[i].c-ptarray[j].c, 2));
+				//euclidian calculations done here 
+				float curr_weight = sqrt(pow(ptarray[i].a- ptarray[j].a, 2) + pow(ptarray[i].b-ptarray[j].b, 2) + pow(ptarray[i].c-ptarray[j].c, 2));
+				
 				if (curr_weight < throw_edge) {
 					REM_EDGES++;
 					edge* forward_edge = malloc(sizeof(edge));
-					forward_edge->source = i; 
-					forward_edge->target = j;
-					forward_edge->weight = curr_weight;
+					forward_edge->source = i, forward_edge->target = j, forward_edge->weight = curr_weight;
 
 					edge* back_edge = malloc(sizeof(edge));
-					back_edge->source = j;
-					back_edge->target = i;
-					back_edge->weight = curr_weight;
+					back_edge->source = j, back_edge->target = i, back_edge->weight = curr_weight;
 
 					forward_edge->next = g[i];
 					g[i] = forward_edge;
@@ -241,29 +226,24 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 		throw_edge;
 		
 		for (i = 0; i < numpoints; i++) {
-			ptarray[i].a = rand() / (float)RAND_MAX;
-			ptarray[i].b = rand() / (float)RAND_MAX;
-			ptarray[i].c = rand() / (float)RAND_MAX;
-			ptarray[i].d = rand() / (float)RAND_MAX;
+			float weight = rand() / (float)RAND_MAX;
+			ptarray[i].a = weight, ptarray[i].b = weight, ptarray[i].c = weight, ptarray[i].d = rand() / (float)RAND_MAX;
 		}
 		for (i = 0; i < numpoints; i++) {
 			int j;
 			for (j = i; j < numpoints; j++) {
-				float curr_weight = sqrt(pow(ptarray[i].a - ptarray[j].a, 2)
-					+ pow(ptarray[i].b - ptarray[j].b, 2)
-					+ pow(ptarray[i].c - ptarray[j].c, 2)
+
+				//euclidian calculation here 
+				float curr_weight = sqrt(pow(ptarray[i].a - ptarray[j].a, 2) + pow(ptarray[i].b - ptarray[j].b, 2) + pow(ptarray[i].c - ptarray[j].c, 2)
 					+ pow(ptarray[i].d - ptarray[j].d, 2));
+				
 				if (curr_weight < throw_edge) {
 					REM_EDGES++;
 					edge* forward_edge = malloc(sizeof(edge));
-					forward_edge->source = i; 
-					forward_edge->target = j;
-					forward_edge->weight = curr_weight;
+					forward_edge->source = i, forward_edge->target = j, forward_edge->weight = curr_weight;
 
 					edge* back_edge = malloc(sizeof(edge));
-					back_edge->source = j;
-					back_edge->target = i;
-					back_edge->weight = curr_weight;
+					back_edge->source = j, back_edge->target = i, back_edge->weight = curr_weight;
 
 					forward_edge->next = g[i];
 					g[i] = forward_edge;
