@@ -33,15 +33,18 @@ void g_free(edge** g, int numpoints) {
 	free(g);
 }
 	
-// Count for edges after thrown away heavy edges 
 
 // set up graph
 edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
-	// seed pseudorandom number generator
+	// seed pseudorandom number generator with time, always different 
 	srand48(time(NULL));
+	int i; 
 
+	//allocate memory for the edges
 	edge** g = malloc(sizeof(edge*)*numpoints);
-	int i;
+	if (g == NULL){
+		return NULL;
+	}
 	for (i = 0; i < numpoints; i++) {
 		g[i] = NULL;
 	}
@@ -54,7 +57,7 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 
 	// thro away edges that make the graph to large- optimization 
 	float throw_edge;
-	throw_edge = 100/(pow(log2((float)numpoints), 4));
+	throw_edge = 100/(pow(log2((float)numpoints), 3));
 	 
 	 switch(dimension){
 	 	case 0: 
@@ -90,7 +93,7 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 		
 		for (i = 0; i < numpoints; i++) {
 			float weight = rand() / (float)RAND_MAX;
-			ptarray[i].a = weight, ptarray[i].b = rand() / (float)RAND_MAX, ptarray[i].c = 0, ptarray[i].d = 0;
+			ptarray[i].a = rand() / (float)RAND_MAX, ptarray[i].b = rand() / (float)RAND_MAX, ptarray[i].c = 0, ptarray[i].d = 0;
 		}
 		
 		for (i = 0; i < numpoints; i++) {
@@ -120,7 +123,8 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 		
 		for (i = 0; i < numpoints; i++) {
 			float weight = rand() / (float)RAND_MAX;
-			ptarray[i].a = weight, ptarray[i].b = weight, ptarray[i].c = rand() / (float)RAND_MAX, ptarray[i].d = 0;
+			ptarray[i].a = rand() / (float)RAND_MAX, ptarray[i].b = rand() / (float)RAND_MAX, 
+			ptarray[i].c = rand() / (float)RAND_MAX, ptarray[i].d = 0;
 		}
 		
 		for (i = 0; i < numpoints; i++) {
@@ -150,7 +154,8 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 		
 		for (i = 0; i < numpoints; i++) {
 			float weight = rand() / (float)RAND_MAX;
-			ptarray[i].a = weight, ptarray[i].b = weight, ptarray[i].c = weight, ptarray[i].d = rand() / (float)RAND_MAX;
+			ptarray[i].a = rand() / (float)RAND_MAX, ptarray[i].b = rand() / (float)RAND_MAX, ptarray[i].c = rand() / (float)RAND_MAX,
+			 ptarray[i].d = rand() / (float)RAND_MAX;
 		}
 		for (i = 0; i < numpoints; i++) {
 			int j;
