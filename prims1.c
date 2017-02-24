@@ -93,7 +93,7 @@ edge deletemin(heap* heap) {
 
 // Prim's algorithm, to find MST and return its weight
 
-float prim(edge** g, graph_node* ptarray, int numpoints, int v_index, int n) {
+float prims(edge** g, graph_node* ptarray, int numpoints, int v_index, int n) {
 	
 	int visited[numpoints];
 		for (n = 0; n < numpoints; n++) visited[n] = 0;
@@ -147,15 +147,17 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 		
-	
+	clock_t begin = clock();
 	float final = 0.0;
 	int run;
 	for (run = 0; run < numtrials; run++) {
+
 		graph_node* pointarray = malloc(sizeof(graph_node) * numpoints);
+
 		edge** g = generate_graph(numpoints, dimension, pointarray);
 
 		// if we prune off too many edges, we will get a zero-weighted MST
-		float results= prim(g, pointarray, numpoints, 0,0);
+		float results= prims(g, pointarray, numpoints, 0,0);
 		final+= results;
 
 		free(pointarray);
