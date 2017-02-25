@@ -1,2 +1,2 @@
-prims1: prims1.c prims1.h
+prims1: prims1.c prims1.h graphgeneration.c graphgeneration.h heap.h
 	gcc -O3 -o prims1 prims1.c graphgeneration.c heap.c -lm
