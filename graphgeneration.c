@@ -11,9 +11,6 @@
 int REM_EDGES = 0;
 
 
-//////////////////////////////////////////////
-//GRAPH CREATION//////////////////////////////
-
 // Get rid of memory so there is room for edges 
 void g_free(edge** g, int numpoints) {
 	
@@ -32,14 +29,20 @@ void g_free(edge** g, int numpoints) {
 	}
 	free(g);
 }
-	
+
 
 // set up graph
 edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 	// seed pseudorandom number generator with time, always different 
 	srand48(time(NULL));
+	
 	int i; 
-
+float throw_edge1;
+float throw_edge2;
+float throw_edge3;
+throw_edge1 = 16.0/(pow(log2((float)numpoints), 3));
+throw_edge2 = 8.0/(pow(log2((float)numpoints),2));
+throw_edge3 = 4.0/(pow(log2((float)numpoints), 3/2));
 	//allocate memory for the edges
 	edge** g = malloc(sizeof(edge*)*numpoints);
 	if (g == NULL){
@@ -55,41 +58,34 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 	// count number of edges after throwing away for optimization 
 	REM_EDGES = 0;
 
-	// thro away edges that make the graph to large- optimization 
-	float throw_edge;
-	throw_edge = 100/(pow(log2((float)numpoints), 3));
-	 
 	 switch(dimension){
 	 	case 0: 
-	 	throw_edge;
+	 	throw_edge1;
 		int i;
 		for (i = 0; i < numpoints; i++) {
 			int j;
 			for (j = i; j < numpoints; j++) {
 				float weight = rand() / (float)RAND_MAX;
 				//forward edges 
-				edge* forward_edge = malloc(sizeof(edge));
-					forward_edge->source = i, forward_edge->target = j, forward_edge->weight = weight;
+				
 				// prune
-				if (weight <= throw_edge) {
-					REM_EDGES++;
-					//backwardeedges 
+				if (weight <= throw_edge1) {
 					
-					edge* back_edge = malloc(sizeof(edge));
-					back_edge->source = j;
-					back_edge->target = i;
-					back_edge->weight = weight;
+					edge* forward_edge = malloc(sizeof(edge));
+					forward_edge->source = i, forward_edge->target = j, forward_edge->weight = weight;
 
 					forward_edge->next = g[i];
 					g[i] = forward_edge;
 
-					back_edge->next = g[j];
-					g[j] = back_edge;
+					REM_EDGES++;
+
+					
+
 				}
 			}
 		}
 		case 2:
-		throw_edge;
+		throw_edge1;
 		
 		for (i = 0; i < numpoints; i++) {
 			float weight = rand() / (float)RAND_MAX;
@@ -102,24 +98,21 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 				
 				//euclidian math done here 
 				float curr_weight = sqrt(pow(ptarray[i].a- ptarray[j].a, 2)+ pow(ptarray[i].b-ptarray[j].b, 2));
-				if (curr_weight < throw_edge) {
-					REM_EDGES++;
+				if (curr_weight < throw_edge1) {
+					
 					edge* forward_edge = malloc(sizeof(edge));
 					forward_edge->source = i, forward_edge->target = j, forward_edge->weight = curr_weight;
 
-					edge* back_edge = malloc(sizeof(edge));
-					back_edge->source = j, back_edge->target = i, back_edge->weight = curr_weight;
-
 					forward_edge->next = g[i];
 					g[i] = forward_edge;
+					REM_EDGES++;
 
-					back_edge->next = g[j];
-					g[j] = back_edge;
+					
 				}				
 			}
 		}
 		case 3: 
-		throw_edge;
+		throw_edge2;
 		
 		for (i = 0; i < numpoints; i++) {
 			float weight = rand() / (float)RAND_MAX;
@@ -133,24 +126,22 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 				//euclidian calculations done here 
 				float curr_weight = sqrt(pow(ptarray[i].a- ptarray[j].a, 2) + pow(ptarray[i].b-ptarray[j].b, 2) + pow(ptarray[i].c-ptarray[j].c, 2));
 				
-				if (curr_weight < throw_edge) {
-					REM_EDGES++;
+				if (curr_weight < throw_edge2) {
+					
 					edge* forward_edge = malloc(sizeof(edge));
 					forward_edge->source = i, forward_edge->target = j, forward_edge->weight = curr_weight;
-
-					edge* back_edge = malloc(sizeof(edge));
-					back_edge->source = j, back_edge->target = i, back_edge->weight = curr_weight;
 
 					forward_edge->next = g[i];
 					g[i] = forward_edge;
 
-					back_edge->next = g[j];
-					g[j] = back_edge;
+					REM_EDGES++;
+
+					
 				}				
 			}
 		}
 		default:
-		throw_edge;
+		throw_edge3;
 		
 		for (i = 0; i < numpoints; i++) {
 			float weight = rand() / (float)RAND_MAX;
@@ -165,24 +156,26 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 				float curr_weight = sqrt(pow(ptarray[i].a - ptarray[j].a, 2) + pow(ptarray[i].b - ptarray[j].b, 2) + pow(ptarray[i].c - ptarray[j].c, 2)
 					+ pow(ptarray[i].d - ptarray[j].d, 2));
 				
-				if (curr_weight < throw_edge) {
-					REM_EDGES++;
+				if (curr_weight < throw_edge3) {
+					
 					edge* forward_edge = malloc(sizeof(edge));
 					forward_edge->source = i, forward_edge->target = j, forward_edge->weight = curr_weight;
 
-					edge* back_edge = malloc(sizeof(edge));
-					back_edge->source = j, back_edge->target = i, back_edge->weight = curr_weight;
-
+		
 					forward_edge->next = g[i];
 					g[i] = forward_edge;
 
-					back_edge->next = g[j];
-					g[j] = back_edge;
+					REM_EDGES++;
+
+				
+
+					
 				}
 			}
 		}
 		return g;
 
 	 }
-
+ 
 }
+
