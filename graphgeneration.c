@@ -25,22 +25,30 @@ void g_free(edge** g, int numpoints) {
 	free(g);
 }
 
+
+float throw(int numpoints, int dimension){
+	if (dimension == 0){
+		return 16.0 / (pow(log2((float)numpoints), 3));
+	}
+	else if (dimension == 2){
+		return 16.0 / (pow(log2((float)numpoints), 3));
+	}
+	else if (dimension == 3){
+		return  8.0 / (pow(log2((float)numpoints), 2));
+	}
+	else{
+		return 4.0 / (pow(log2((float)numpoints), 3 / 2));
+	
+	}
+}
 // set up graph
 edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 	// seed pseudorandom number generator with time, always different
 	srand48(time(NULL));
 	int i;
-	float throw_edge1;
-	float throw_edge2;
-	float throw_edge3;
-	throw_edge1 = 16.0 / (pow(log2((float)numpoints), 3));
-	throw_edge2 = 8.0 / (pow(log2((float)numpoints), 2));
-	throw_edge3 = 4.0 / (pow(log2((float)numpoints), 3 / 2));
+	float cutoff = throw(numpoints, dimension);
 	//allocate memory for the edges
 	edge** g = malloc(sizeof(edge*)*numpoints);
-	if (g == NULL) {
-		return NULL;
-	}
 	for (i = 0; i < numpoints; i++) {
 		g[i] = NULL;
 	}
@@ -51,24 +59,30 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 
 	switch (dimension) {
 	case 0:
-		throw_edge1;
+		cutoff;
 		int i;
 		for (i = 0; i < numpoints; i++) {
 			int j;
 			for (j = i; j < numpoints; j++) {
 				float weight = rand() / (float)RAND_MAX;
 				// prune
-				if (weight <= throw_edge1) {
+				if (weight <= cutoff) {
 					edge* edge = malloc(sizeof(edge));
 					edge->source = i, edge->target = j, edge->weight = weight;
 					edge->next = g[i];
 					g[i] = edge;
 					REM_EDGES++;
-				}
+
+			// Realloc for more space if cap reached
+            //if (REM_EDGES >= cutoff) {
+              //  edge = realloc(sizeof(edge));
+				//}
+			}
+
 			}
 		}
 	case 2:
-		throw_edge1;
+		cutoff;
 
 		for (i = 0; i < numpoints; i++) {
 			float weight = rand() / (float)RAND_MAX;
@@ -80,7 +94,7 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 			for (j = i; j < numpoints; j++) {
 				//euclidian math done here
 				float cweight = sqrt(pow(ptarray[i].a - ptarray[j].a, 2) + pow(ptarray[i].b - ptarray[j].b, 2));
-				if (cweight < throw_edge1) {
+				if (cweight < cutoff) {
 					edge* edge = malloc(sizeof(edge));
 					edge->source = i, edge->target = j, edge->weight = cweight;
 					edge->next = g[i];
@@ -90,7 +104,7 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 			}
 		}
 	case 3:
-		throw_edge2;
+		cutoff;
 
 		for (i = 0; i < numpoints; i++) {
 			float weight = rand() / (float)RAND_MAX;
@@ -104,7 +118,7 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 				//euclidian calculations done here
 				float cweight = sqrt(pow(ptarray[i].a - ptarray[j].a, 2) + pow(ptarray[i].b - ptarray[j].b, 2) + pow(ptarray[i].c - ptarray[j].c, 2));
 
-				if (cweight < throw_edge2) {
+				if (cweight < cutoff) {
 					edge* edge = malloc(sizeof(edge));
 					edge->source = i,
 					      edge->target = j,
@@ -116,7 +130,7 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 			}
 		}
 	default:
-		throw_edge3;
+		cutoff;
 
 		for (i = 0; i < numpoints; i++) {
 			float weight = rand() / (float)RAND_MAX;
@@ -131,7 +145,7 @@ edge **generate_graph(int numpoints, int dimension, graph_node* ptarray) {
 				float cweight = sqrt(pow(ptarray[i].a - ptarray[j].a, 2) + pow(ptarray[i].b - ptarray[j].b, 2) + pow(ptarray[i].c - ptarray[j].c, 2)
 				                     + pow(ptarray[i].d - ptarray[j].d, 2));
 
-				if (cweight < throw_edge3) {
+				if (cweight < cutoff) {
 
 					edge* edge = malloc(sizeof(edge));
 					edge->source = i, edge->target = j, edge->weight = cweight;
