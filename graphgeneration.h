@@ -6,10 +6,12 @@ extern REM_EDGES;
 
 void g_free(edge** g, int numpoints);
 edge **generate_graph(int numpoints, int dimension, graph_node* ptarray);
-
+float throw(int numpoints, int dimension);
 
 int i;
 int j;
 int weight;
+
+
 
 #endif 
