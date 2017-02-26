@@ -21,7 +21,7 @@ float prims(edge** g, graph_node* ptarray, int numpoints, int v_index, int n) {
 	//Initialize heap for placing edges
 	//Allocate memory for the edges in the heap
 	heap* x = malloc(sizeof(heap)*4);
-	x->heap = malloc(sizeof(edge) * REM_EDGES);
+	x->heap = malloc(sizeof(edge) * REM_EDGES * 4);
 	//First initialize everything to zero
 	x->heapsz = 0;
 	edge first = {0, 0, 0, 0};
