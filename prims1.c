@@ -20,7 +20,7 @@ float prims(edge** g, graph_node* ptarray, int numpoints, int v_index, int n) {
 
 	//Initialize heap for placing edges
 	//Allocate memory for the edges in the heap
-	heap* x = malloc(sizeof(heap)*4);
+	heap* x = malloc(sizeof(heap) * 4);
 	x->heap = malloc(sizeof(edge) * REM_EDGES * 4);
 	//First initialize everything to zero
 	x->heapsz = 0;
@@ -47,10 +47,10 @@ float prims(edge** g, graph_node* ptarray, int numpoints, int v_index, int n) {
 			}
 			float weightresult = (rweight += destroyed.weight);
 		}
-		
+
 	}
 	//Free memory from the heap to prevent seg fault
-	//free(x);
+	free(x);
 
 	free(x->heap);
 	//Return weight of the edge
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 	int dimension = atoi(argv[4]);
 
 	//Check to make sure dimensions are valid
-	if (dimension == 1 || dimension > 4) {
+	if (dimension == 1 || dimension >= 5) {
 		printf("invalid dimension input\n");
 		return 0;
 	}
@@ -80,19 +80,18 @@ int main(int argc, char* argv[]) {
 	for (run = 0; run < numtrials; run++) {
 		//Allocate memory for generated graoh
 		graph_node* pointarray = malloc(sizeof(graph_node) * numpoints * 10);
-		//Generate graph based on inputs 
+		//Generate graph based on inputs
 		edge** g = generate_graph(numpoints, dimension, pointarray);
-
-		// If too many edges have been thrown away, MST will be zero 
+		// If too many edges have been thrown away from pruning then the minimum spanning tree = 0
 		float results = prims(g, pointarray, numpoints, 0, 0);
 		final += results;
-
+		//Free memory so there is not seg fault
 		free(pointarray);
 		g_free(g, numpoints);
 	}
-
+	//Finish recording the time
 	time_t end = time(NULL);
-
+	//Calculate MST final value
 	final = final / numtrials;
 	printf("total program runtime: %li\n", end - start);
 	printf("%f %i %i %i\n", final, numpoints, numtrials, dimension);
